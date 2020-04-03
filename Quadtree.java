@@ -7,13 +7,13 @@ public class Quadtree {
 
     public final int QT_CAPACITY = 4;
 
-    //Boundaries of current 'node'
+    // Boundaries of current 'node'
     Square boundary;
 
-    //Array of points within boundary
+    // Array of points within boundary
     PointStack points = new PointStack();
 
-    //children
+    // children
     Quadtree nw;
     Quadtree ne;
     Quadtree sw;
@@ -29,24 +29,29 @@ public class Quadtree {
         }
 
         // if there is space in the quad and its not subdivided, add object here
-        if(points.size() < QT_CAPACITY && nw == null) {
+        if (points.size() < QT_CAPACITY && nw == null) {
             points.push(p);
             return true;
         }
 
-        //otherwise, subdivide and add the point to whichever node will accept it and insert all node into the subclasses
+        // otherwise, subdivide and add the point to whichever node will accept it and
+        // insert all node into the subclasses
         if (nw == null) {
             subdivide();
             Point[] ps = points.getAll();
-            for(Point sP : ps) {
+            for (Point sP : ps) {
                 this.insert(sP);
             }
         }
 
-        if(nw.insert(p)) return true;
-        if(ne.insert(p)) return true;
-        if(sw.insert(p)) return true;
-        if(se.insert(p)) return true;
+        if (nw.insert(p))
+            return true;
+        if (ne.insert(p))
+            return true;
+        if (sw.insert(p))
+            return true;
+        if (se.insert(p))
+            return true;
 
         return false;
     }
@@ -54,15 +59,15 @@ public class Quadtree {
     public void subdivide() {
         double x = this.boundary.getCenter().getX();
         double y = this.boundary.getCenter().getY();
-        double halfLength = this.boundary.getHalfLength()/2;
+        double halfLength = this.boundary.getHalfLength() / 2;
 
-        Square nw = new Square(new Point( x - halfLength, y + halfLength), halfLength);
+        Square nw = new Square(new Point(x - halfLength, y + halfLength), halfLength);
         this.nw = new Quadtree(nw);
-        Square ne = new Square(new Point( x + halfLength, y + halfLength), halfLength);
+        Square ne = new Square(new Point(x + halfLength, y + halfLength), halfLength);
         this.ne = new Quadtree(ne);
-        Square sw = new Square(new Point( x - halfLength, y - halfLength), halfLength);
+        Square sw = new Square(new Point(x - halfLength, y - halfLength), halfLength);
         this.sw = new Quadtree(sw);
-        Square se = new Square(new Point( x + halfLength, y - halfLength), halfLength);
+        Square se = new Square(new Point(x + halfLength, y - halfLength), halfLength);
         this.se = new Quadtree(se);
 
     }
@@ -70,13 +75,16 @@ public class Quadtree {
     public PointStack queryRange(Square range) {
         PointStack pointsInRange = new PointStack();
 
-        if (!this.boundary.intersects(range)) return pointsInRange;
+        if (!this.boundary.intersects(range))
+            return pointsInRange;
 
-        if(this.nw == null) {
+        // only if its the end node add points to stack
+        if (this.nw == null) {
             Point[] pointsArray = this.points.getAll();
-            if(pointsArray != null) {
-                for(Point p : pointsArray) {
-                    if(range.contains(p)) pointsInRange.push(p);
+            if (pointsArray != null) {
+                for (Point p : pointsArray) {
+                    if (range.contains(p))
+                        pointsInRange.push(p);
                 }
             }
             return pointsInRange;
@@ -90,16 +98,15 @@ public class Quadtree {
         return pointsInRange;
     }
 
-
     public static void main(String[] args) {
         int length = 1000;
         StdDraw.setCanvasSize(length, length);
         StdDraw.setScale(0, length);
 
-        Square rootBoundry = new Square(new Point(length/2, length/2), length/2);
+        Square rootBoundry = new Square(new Point(length / 2, length / 2), length / 2);
         Quadtree root = new Quadtree(rootBoundry);
 
-        for(int i = 0; i < 800; i++) {
+        for (int i = 0; i < 800; i++) {
             double rX = Math.random() * length;
             double rY = Math.random() * length;
             Point p = new Point(rX, rY);
@@ -120,7 +127,7 @@ public class Quadtree {
         StdDraw.setPenColor(Color.GREEN);
         Point[] selectedPoints = root.queryRange(searchBoundary).getAll();
         System.out.println(selectedPoints.toString());
-        for(Point p : selectedPoints) {
+        for (Point p : selectedPoints) {
             StdDraw.filledCircle(p.getX(), p.getY(), 2);
             StdDraw.show();
         }
